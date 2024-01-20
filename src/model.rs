@@ -2,12 +2,18 @@ use rand::prelude::*;
 use std::time;
 
 pub const FPS: i32 = 30;
-pub const WORLD_W: f32 = 600.0;
-pub const WORLD_H: f32 = 600.0;
+pub const FIELD_W: usize = 16;
+pub const FIELD_H: usize = 256;
+pub const MOVE_WAIT: i32 = 3;
+pub const CELL_SIZE: i32 = 20;
+pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Command {
     None,
+    Left,
+    Right,
+    Shoot,
 }
 
 #[derive(Default, Debug, Copy, Clone, Eq, PartialEq)]
@@ -41,6 +47,11 @@ pub struct Game {
     pub erased: Vec<Vec<bool>>,
     pub cursor: Point,
     pub erase_dir: Direction,
+    pub field: [[i32; FIELD_W]; FIELD_H],
+    pub player_x: usize,
+    // pub player_offset: i32,
+    pub move_dir: Direction,
+    pub move_wait: i32,
 }
 
 impl Game {
@@ -65,6 +76,11 @@ impl Game {
             erased: Vec::new(),
             cursor: Point::default(),
             erase_dir: Direction::Right,
+            field: [[0; FIELD_W]; FIELD_H],
+            player_x: FIELD_W / 2,
+            // player_offset: 0,
+            move_dir: Direction::Left,
+            move_wait: 0,
         };
 
         game.erased = vec![vec![false; game.width]; game.height];
@@ -73,6 +89,68 @@ impl Game {
     }
 
     pub fn update(&mut self, command: Command) {
+        self.frame += 1;
+
+        if self.is_over {
+            return;
+        }
+
+        self.move_player();
+
+        match command {
+            Command::Shoot => self.shoot(),
+            Command::Left | Command::Right => self.start_move_player(command),
+            _ => {}
+        }
+    }
+
+    // 移動中のアニメーション処理
+    pub fn move_player(&mut self) {
+        if self.move_wait > 0 {
+            self.move_wait -= 1;
+            if self.move_dir == Direction::Left {
+                // self.player_offset -= self.move_wait / MOVE_WAIT;
+                // if self.player_offset == 0 {
+                if self.move_wait == 0 {
+                    self.player_x -= 1;
+                }
+            } else if self.move_dir == Direction::Right {
+                // self.player_offset += self.move_wait / MOVE_WAIT;
+                // if self.player_offset == 0 {
+                if self.move_wait == 0 {
+                    self.player_x += 1;
+                }
+            }
+        }
+    }
+
+    pub fn start_move_player(&mut self, command: Command) {
+        if self.move_wait == 0 {
+            match command {
+                Command::Left => {
+                    if self.player_x >= 1 {
+                        self.move_dir = Direction::Left;
+                        self.move_wait = MOVE_WAIT;
+                    }
+                }
+                Command::Right => {
+                    if self.player_x + 1 < FIELD_W {
+                        self.move_dir = Direction::Right;
+                        self.move_wait = MOVE_WAIT;
+                    }
+                }
+                _ => return,
+            };
+        }
+    }
+
+    pub fn shoot(&mut self) {
+        if self.move_wait == 0 {
+            println!("shoot");
+        }
+    }
+
+    pub fn update_erase(&mut self, command: Command) {
         self.frame += 1;
 
         if self.is_over {
@@ -119,9 +197,15 @@ impl Game {
                 self.is_over = true;
             }
         }
-
-        match command {
-            Command::None => {}
-        }
     }
+}
+
+fn clamp<T: PartialOrd>(min: T, value: T, max: T) -> T {
+    if value < min {
+        return min;
+    }
+    if value > max {
+        return max;
+    }
+    value
 }

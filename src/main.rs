@@ -2,9 +2,8 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer;
 use sdl2::pixels::Color;
-use sdl2::rect::{Point, Rect};
+use sdl2::rect::Rect;
 use sdl2::render::{BlendMode, Canvas, Texture, TextureCreator};
-use sdl2::sys::KeyCode;
 use sdl2::ttf::Sdl2TtfContext;
 use sdl2::video::{Window, WindowContext};
 use std::collections::HashMap;
@@ -13,10 +12,8 @@ use std::time::{Duration, SystemTime};
 mod model;
 use crate::model::*;
 
-pub const SCREEN_WIDTH: i32 = WORLD_W as i32;
-pub const SCREEN_HEIGHT: i32 = WORLD_H as i32;
-pub const CELL_SIZE: i32 = 20;
-pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
+pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32;
+pub const SCREEN_HEIGHT: i32 = CELL_SIZE * 16;
 
 struct Image<'a> {
     texture: Texture<'a>,
@@ -92,7 +89,15 @@ pub fn main() -> Result<(), String> {
                             if game.is_over {
                                 // game = Game::new();
                                 // game.init();
+                            } else {
+                                command = Command::Shoot;
                             }
+                        }
+                        Keycode::Left => {
+                            command = Command::Left;
+                        }
+                        Keycode::Right => {
+                            command = Command::Right;
                         }
                         _ => {}
                     };
@@ -209,19 +214,41 @@ fn render(
 
     let font = resources.fonts.get_mut("boxfont").unwrap();
 
-    canvas.set_draw_color(Color::RGB(255, 128, 128));
-    for y in 0..game.height {
-        for x in 0..game.width {
-            if !game.erased[y][x] {
-                canvas.fill_rect(Rect::new(
-                    100 + x as i32 * CELL_SIZE,
-                    100 + y as i32 * CELL_SIZE,
-                    CELL_SIZEu32 - 1,
-                    CELL_SIZEu32 - 1,
-                ))?;
-            }
-        }
+    // render player
+    canvas.set_draw_color(Color::RGB(128, 128, 255));
+    let offset_x;
+    if game.move_wait > 0 {
+        offset_x = ((if game.move_dir == Direction::Left {
+            -1.0
+        } else {
+            1.0
+        }) * ((MOVE_WAIT - game.move_wait) as f32 / MOVE_WAIT as f32)
+            * CELL_SIZE as f32) as i32;
+    } else {
+        offset_x = 0;
     }
+    println!("{} {}", game.move_wait, offset_x);
+    canvas.fill_rect(Rect::new(
+        game.player_x as i32 * CELL_SIZE + offset_x,
+        SCREEN_HEIGHT - CELL_SIZE,
+        CELL_SIZEu32,
+        CELL_SIZEu32,
+    ))?;
+
+    // 渦巻き状に消えるブロックを描画
+    // canvas.set_draw_color(Color::RGB(255, 128, 128));
+    // for y in 0..game.height {
+    //     for x in 0..game.width {
+    //         if !game.erased[y][x] {
+    //             canvas.fill_rect(Rect::new(
+    //                 100 + x as i32 * CELL_SIZE,
+    //                 100 + y as i32 * CELL_SIZE,
+    //                 CELL_SIZEu32 - 1,
+    //                 CELL_SIZEu32 - 1,
+    //             ))?;
+    //         }
+    //     }
+    // }
 
     render_font(
         canvas,
