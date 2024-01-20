@@ -15,6 +15,8 @@ use crate::model::*;
 
 pub const SCREEN_WIDTH: i32 = WORLD_W as i32;
 pub const SCREEN_HEIGHT: i32 = WORLD_H as i32;
+pub const CELL_SIZE: i32 = 20;
+pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
 
 struct Image<'a> {
     texture: Texture<'a>,
@@ -66,7 +68,7 @@ pub fn main() -> Result<(), String> {
 
     let mut event_pump = sdl_context.event_pump()?;
 
-    let mut game = Game::new();
+    let mut game = Game::new(2, 2);
 
     println!("Keys:");
     println!("  Space       : Restart when gameover");
@@ -88,7 +90,8 @@ pub fn main() -> Result<(), String> {
                     match code {
                         Keycode::Space => {
                             if game.is_over {
-                                game = Game::new();
+                                // game = Game::new();
+                                // game.init();
                             }
                         }
                         _ => {}
@@ -101,6 +104,14 @@ pub fn main() -> Result<(), String> {
         render(&mut canvas, &game, &mut resources)?;
 
         play_sounds(&mut game, &resources);
+
+        if game.is_over {
+            if game.height < game.width {
+                game = Game::new(game.width, game.height + 1);
+            } else {
+                game = Game::new(game.width + 1, 2);
+            }
+        }
 
         let finished = SystemTime::now();
         let elapsed = finished.duration_since(started).unwrap();
@@ -199,17 +210,40 @@ fn render(
     let font = resources.fonts.get_mut("boxfont").unwrap();
 
     canvas.set_draw_color(Color::RGB(255, 128, 128));
-    canvas.fill_rect(Rect::new(100, 100, 20, 20))?;
+    for y in 0..game.height {
+        for x in 0..game.width {
+            if !game.erased[y][x] {
+                canvas.fill_rect(Rect::new(
+                    100 + x as i32 * CELL_SIZE,
+                    100 + y as i32 * CELL_SIZE,
+                    CELL_SIZEu32 - 1,
+                    CELL_SIZEu32 - 1,
+                ))?;
+            }
+        }
+    }
 
     render_font(
         canvas,
         font,
-        "HOGE".to_string(),
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 2,
-        Color::RGBA(128, 128, 255, 255),
-        true,
+        format!("{} x {}", game.width, game.height).to_string(),
+        0,
+        0,
+        Color::RGBA(255, 255, 255, 255),
+        false,
     );
+
+    if game.is_over {
+        render_font(
+            canvas,
+            font,
+            "GAME OVER".to_string(),
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            Color::RGBA(128, 128, 255, 255),
+            true,
+        );
+    }
 
     canvas.present();
 
