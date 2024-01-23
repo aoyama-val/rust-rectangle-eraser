@@ -127,12 +127,6 @@ impl Game {
 
         game.load_stage("resources/data/stage1.txt");
 
-        // println!("STAGE");
-        // for row in &game.stage {
-        //     println!("{}", row);
-        // }
-        // println!("STAGE");
-
         game
     }
 
@@ -147,7 +141,6 @@ impl Game {
         };
 
         for (_, line) in content.lines().enumerate() {
-            // println!("{}", line.len());
             let row = ((line.to_string() + &" ".repeat(FIELD_W as usize))[0..FIELD_W]).to_string();
             assert!(row.len() == FIELD_W);
             self.stage.push(row);
@@ -374,13 +367,10 @@ impl Game {
     }
 
     pub fn shoot(&mut self) {
-        println!("shoot");
         if self.shoot_wait > 0 {
-            println!("shoot_wait = {}", self.shoot_wait);
             return;
         }
         if self.bullets.len() as i32 >= BULLET_COUNT_MAX {
-            println!("len = {}", self.bullets.len());
             return;
         }
         let bullet = Bullet::new(self.player_x);

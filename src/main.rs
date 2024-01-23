@@ -83,8 +83,6 @@ pub fn main() -> Result<(), String> {
     println!("  Up          : Scroll");
     println!("  Enter       : Restart when gameover");
 
-    field::test();
-
     'running: loop {
         let started = SystemTime::now();
 

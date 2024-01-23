@@ -38,7 +38,6 @@ impl Field {
         };
 
         let lines: Vec<&str> = cells_text.lines().collect();
-        println!("{:?}", lines);
         for y in 0..FIELD_H {
             let line = lines[y].to_string();
             for x in 0..FIELD_W {
@@ -193,32 +192,69 @@ impl Field {
     }
 }
 
-pub fn test() {
-    #[rustfmt::skip]
-    let cells_text: String =
-          "                \n".to_string()
-        + "                \n"
-        + "                \n"
-        + "   1112222      \n"
-        + "   1  2  2      \n"
-        + "   1  2  2      \n"
-        + "   3334444      \n"
-        + "   3555666      \n"
-        + "   3577776      \n"
-        + "   3577776      \n"
-        + "   3577776      \n"
-        + "                \n"
-        + "                \n"
-        + "                \n"
-        + "                \n"
-        + "                \n"
-        + "";
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let field = Field::from_text(&cells_text);
-    field.print_with_coord();
-    let rectangles = field.find_all_rectangles();
-    println!("len = {}", rectangles.len());
-    for rectangle in rectangles {
-        println!("{:?}", rectangle);
+    #[test]
+    fn test_check_erase_row() {
+        #[rustfmt::skip]
+        let cells_text: String =
+              "                \n".to_string()
+            + "                \n"
+            + "                \n"
+            + "   1112222      \n"
+            + "   1  2  2      \n"
+            + "   1  2  2      \n"
+            + "   3334444      \n"
+            + "   3555666      \n"
+            + "   3577776      \n"
+            + "   3577776      \n"
+            + "   3577776      \n"
+            + "                \n"
+            + "                \n"
+            + "                \n"
+            + "                \n"
+            + "                \n"
+            + "";
+
+        let field = Field::from_text(&cells_text);
+        let mut rectangles = field.find_all_rectangles();
+        rectangles.sort_by(|a, b| b.area().cmp(&a.area()));
+        assert_eq!(
+            rectangles,
+            vec![
+                Rectangle {
+                    left: 3,
+                    top: 3,
+                    right: 9,
+                    bottom: 10
+                },
+                Rectangle {
+                    left: 3,
+                    top: 6,
+                    right: 9,
+                    bottom: 10
+                },
+                Rectangle {
+                    left: 4,
+                    top: 7,
+                    right: 9,
+                    bottom: 10
+                },
+                Rectangle {
+                    left: 6,
+                    top: 3,
+                    right: 9,
+                    bottom: 6
+                },
+                Rectangle {
+                    left: 5,
+                    top: 8,
+                    right: 8,
+                    bottom: 10
+                }
+            ]
+        );
     }
 }
