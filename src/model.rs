@@ -163,6 +163,8 @@ impl Game {
 
         self.update_bullets();
 
+        self.erase_rectangles();
+
         self.move_player();
         if self.shoot_wait > 0 {
             self.shoot_wait -= 1;
@@ -276,6 +278,17 @@ impl Game {
         let bullet = Bullet::new(self.player_x);
         self.bullets.push(bullet);
         self.shoot_wait = SHOOT_WAIT;
+    }
+
+    pub fn erase_rectangles(&mut self) {
+        let r = self.field.find_rectangle_to_be_erased();
+        if let Some(r) = r {
+            for y in r.top..=r.bottom {
+                for x in r.left..=r.right {
+                    self.field.cells[y][x] = EMPTY;
+                }
+            }
+        }
     }
 
     pub fn update_erase(&mut self, command: Command) {

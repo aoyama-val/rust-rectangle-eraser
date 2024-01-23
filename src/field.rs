@@ -15,6 +15,12 @@ pub struct Rectangle {
     pub bottom: usize,
 }
 
+impl Rectangle {
+    pub fn area(&self) -> usize {
+        (self.right - self.left + 1) * (self.bottom - self.top + 1)
+    }
+}
+
 #[derive(Default)]
 pub struct Field {
     pub cells: [[Cell; FIELD_W]; FIELD_H],
@@ -152,8 +158,6 @@ impl Field {
         let tlbr = self.find_corners();
         let top_lefts = tlbr.0;
         let bottom_rights = tlbr.1;
-        println!("{:?}", top_lefts);
-        println!("{:?}", bottom_rights);
 
         let mut answers = Vec::new();
         for (_, tl) in &top_lefts {
@@ -173,6 +177,15 @@ impl Field {
             }
         }
         return answers;
+    }
+
+    pub fn find_rectangle_to_be_erased(&self) -> Option<Rectangle> {
+        let mut answers = self.find_all_rectangles();
+        answers.sort_by(|a, b| b.area().cmp(&a.area()));
+        if answers.len() >= 1 {
+            return Some(answers[0]);
+        }
+        return None;
     }
 }
 
