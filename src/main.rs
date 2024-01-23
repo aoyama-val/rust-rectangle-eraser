@@ -81,7 +81,7 @@ pub fn main() -> Result<(), String> {
     println!("Keys:");
     println!("  Left, Right : Move player");
     println!("  Up          : Scroll");
-    println!("  Space       : Restart when gameover");
+    println!("  Enter       : Restart when gameover");
 
     field::test();
 
@@ -114,12 +114,9 @@ pub fn main() -> Result<(), String> {
                     }
                     is_keydown = true;
                     match code {
-                        Keycode::Space => {
+                        Keycode::Return => {
                             if game.is_over {
-                                // game = Game::new();
-                                // game.init();
-                                // } else {
-                                //     command = Command::Shoot;
+                                game = Game::new();
                             }
                         }
                         Keycode::F1 => game.toggle_debug(),
@@ -346,15 +343,8 @@ fn render(
     );
 
     if game.is_over {
-        render_font(
-            canvas,
-            font,
-            "GAME OVER".to_string(),
-            (SCREEN_WIDTH - INFO_WIDTH) / 2,
-            205,
-            Color::RGBA(128, 128, 255, 255),
-            true,
-        );
+        canvas.set_draw_color(Color::RGBA(255, 0, 0, 128));
+        canvas.fill_rect(Rect::new(0, 0, SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32))?;
     }
 
     if game.is_clear {
@@ -417,9 +407,6 @@ fn play_sounds(game: &mut Game, resources: &Resources) {
             _ => sdl2::mixer::Channel::all(),
         };
         channel.play(&chunk, 0).expect("cannot play sound");
-        sdl2::mixer::Channel::all()
-            .play(&chunk, 0)
-            .expect("cannot play sound");
     }
     game.requested_sounds = Vec::new();
 }

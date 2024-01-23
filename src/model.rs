@@ -195,6 +195,8 @@ impl Game {
             _ => {}
         }
 
+        self.check_gameover();
+
         self.bullets.retain(|x| x.exist);
         self.erasing_effects.retain(|x| x.exist);
     }
@@ -430,5 +432,14 @@ impl Game {
             }
         }
         return None;
+    }
+
+    pub fn check_gameover(&mut self) {
+        for x in 0..FIELD_W {
+            if self.field.cells[FIELD_H - 1][x] != EMPTY {
+                self.is_over = true;
+                self.requested_sounds.push("crash.wav");
+            }
+        }
     }
 }
