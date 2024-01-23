@@ -1,4 +1,3 @@
-use field::EMPTY;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer;
@@ -8,7 +7,8 @@ use sdl2::render::{BlendMode, Canvas, Texture, TextureCreator};
 use sdl2::ttf::Sdl2TtfContext;
 use sdl2::video::{Window, WindowContext};
 use std::collections::HashMap;
-use std::fs;
+use std::fs::{self, File};
+use std::io::Write;
 use std::time::{Duration, SystemTime};
 mod field;
 mod model;
@@ -83,6 +83,8 @@ pub fn main() -> Result<(), String> {
     println!("  Up          : Scroll");
     println!("  Enter       : Restart when gameover");
 
+    let mut command_log = File::create("command.log").unwrap();
+
     'running: loop {
         let started = SystemTime::now();
 
@@ -127,6 +129,12 @@ pub fn main() -> Result<(), String> {
                 _ => {}
             }
         }
+
+        command_log
+            .write_all(format!("{:?}\n", command).as_bytes())
+            .ok();
+        command_log.flush().ok();
+
         if !game.is_debug || is_keydown {
             game.update(command);
         }
