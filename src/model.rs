@@ -3,7 +3,7 @@ use std::time;
 
 pub const FPS: i32 = 30;
 pub const FIELD_W: usize = 16;
-pub const FIELD_H: usize = 256;
+pub const FIELD_H: usize = 16;
 pub const MOVE_WAIT: i32 = 3;
 pub const CELL_SIZE: i32 = 20;
 pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
@@ -48,6 +48,7 @@ pub struct Game {
     pub cursor: Point,
     pub erase_dir: Direction,
     pub field: [[i32; FIELD_W]; FIELD_H],
+    pub stage: Vec<String>,
     pub player_x: usize,
     // pub player_offset: i32,
     pub move_dir: Direction,
@@ -77,6 +78,7 @@ impl Game {
             cursor: Point::default(),
             erase_dir: Direction::Right,
             field: [[0; FIELD_W]; FIELD_H],
+            stage: Vec::new(),
             player_x: FIELD_W / 2,
             // player_offset: 0,
             move_dir: Direction::Left,
@@ -85,7 +87,27 @@ impl Game {
 
         game.erased = vec![vec![false; game.width]; game.height];
 
+        game.load_stage("resources/data/stage1.txt");
+        // println!("STAGE");
+        // for row in &game.stage {
+        //     println!("{}", row);
+        // }
+        // println!("STAGE");
+
         game
+    }
+
+    pub fn load_stage(&mut self, filename: &str) {
+        let Ok(content) = std::fs::read_to_string(filename) else {
+            panic!("Cannot load: {}", filename);
+        };
+
+        for (_, line) in content.lines().enumerate() {
+            // println!("{}", line.len());
+            let row = ((line.to_string() + &" ".repeat(FIELD_W as usize))[0..FIELD_W]).to_string();
+            assert!(row.len() == FIELD_W);
+            self.stage.push(row);
+        }
     }
 
     pub fn update(&mut self, command: Command) {
