@@ -89,6 +89,7 @@ pub struct Game {
     pub scroll_wait: i32,
     pub bullets: Vec<Bullet>,
     pub erasing_effects: Vec<ErasingEffect>,
+    pub score: i32,
 }
 
 impl Game {
@@ -121,6 +122,7 @@ impl Game {
             scroll_wait: SCROLL_WAIT,
             bullets: Vec::new(),
             erasing_effects: Vec::new(),
+            score: 0,
         };
 
         game.load_stage("resources/data/stage1.txt");
@@ -384,6 +386,14 @@ impl Game {
                 right: r.right,
                 bottom: r.bottom,
             });
+        }
+    }
+
+    pub fn get_progress(&self) -> i32 {
+        if self.is_clear {
+            100
+        } else {
+            (100.0 - (self.next_row as f32 / self.stage.len() as f32) * 100.0) as i32
         }
     }
 }

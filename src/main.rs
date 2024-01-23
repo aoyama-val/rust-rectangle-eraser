@@ -15,8 +15,9 @@ mod model;
 use crate::field::*;
 use crate::model::*;
 
-pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32;
+pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32 + INFO_WIDTH;
 pub const SCREEN_HEIGHT: i32 = CELL_SIZE * 16;
+pub const INFO_WIDTH: i32 = 200;
 
 struct Image<'a> {
     texture: Texture<'a>,
@@ -219,7 +220,7 @@ fn render(
     game: &Game,
     resources: &mut Resources,
 ) -> Result<(), String> {
-    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.set_draw_color(Color::RGB(0, 0, 32));
     canvas.clear();
 
     let font = resources.fonts.get_mut("boxfont").unwrap();
@@ -290,6 +291,53 @@ fn render(
         ))?;
     }
 
+    // render info
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.fill_rect(Rect::new(
+        SCREEN_WIDTH - INFO_WIDTH,
+        0,
+        INFO_WIDTH as u32,
+        SCREEN_HEIGHT as u32,
+    ))?;
+    let font_color = Color::RGB(0x6A, 0x5D, 0x1F);
+    let font_color2 = Color::RGB(0x76, 0x6E, 0x5A);
+    // render_font(
+    //     canvas,
+    //     font,
+    //     "Progress".to_string(),
+    //     SCREEN_WIDTH - INFO_WIDTH + 40,
+    //     200,
+    //     font_color,
+    //     false,
+    // );
+    render_font(
+        canvas,
+        font,
+        format!("{:3} pct", game.get_progress()).to_string(),
+        SCREEN_WIDTH - INFO_WIDTH + 40,
+        180,
+        font_color,
+        false,
+    );
+    // render_font(
+    //     canvas,
+    //     font,
+    //     "Score".to_string(),
+    //     SCREEN_WIDTH - INFO_WIDTH + 40,
+    //     260,
+    //     font_color2,
+    //     false,
+    // );
+    render_font(
+        canvas,
+        font,
+        format!("  {:05}", game.score).to_string(),
+        SCREEN_WIDTH - INFO_WIDTH + 40,
+        230,
+        font_color2,
+        false,
+    );
+
     if game.is_over {
         render_font(
             canvas,
@@ -306,7 +354,7 @@ fn render(
         render_font(
             canvas,
             font,
-            "CLEAR".to_string(),
+            "CONGRATULATIONS!".to_string(),
             SCREEN_WIDTH / 2,
             SCREEN_HEIGHT / 2,
             Color::RGBA(255, 255, 128, 255),
