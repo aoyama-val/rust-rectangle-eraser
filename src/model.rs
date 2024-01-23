@@ -6,6 +6,7 @@ pub const FIELD_W: usize = 16;
 pub const FIELD_H: usize = 16;
 pub const MOVE_WAIT: i32 = 3;
 pub const SHOOT_WAIT: i32 = 5;
+pub const SCROLL_WAIT: i32 = 30;
 pub const BULLET_COUNT_MAX: i32 = 4;
 pub const BULLET_SPEED: i32 = 30;
 pub const CELL_SIZE: i32 = 30;
@@ -68,7 +69,7 @@ pub struct Game {
     pub erased: Vec<Vec<bool>>,
     pub cursor: Point,
     pub erase_dir: Direction,
-    pub field: [String; FIELD_H],
+    pub field: [[char; FIELD_W]; FIELD_H],
     pub stage: Vec<String>,
     pub next_row: usize,
     pub player_x: usize,
@@ -103,24 +104,7 @@ impl Game {
             erased: Vec::new(),
             cursor: Point::default(),
             erase_dir: Direction::Right,
-            field: [
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-                " ".repeat(FIELD_W).to_string(),
-            ],
+            field: [[' '; FIELD_W]; FIELD_H],
             stage: Vec::new(),
             next_row: 0,
             player_x: FIELD_W / 2,
@@ -171,7 +155,7 @@ impl Game {
             return;
         }
 
-        if self.frame % 15 == 0 {
+        if self.frame % SCROLL_WAIT == 0 {
             self.scroll();
         }
 
@@ -198,7 +182,9 @@ impl Game {
         for y in (1..=(FIELD_H - 1)).rev() {
             self.field[y] = self.field[y - 1].clone();
         }
-        self.field[0] = self.stage[self.next_row].clone();
+        for x in 0..FIELD_W {
+            self.field[0][x] = self.stage[self.next_row].chars().nth(x).unwrap();
+        }
         self.next_row -= 1;
     }
 
@@ -226,13 +212,7 @@ impl Game {
         for bullet in &mut self.bullets {
             let mut fix_bullet = false;
 
-            if bullet.pos.y >= 1
-                && self.field[bullet.pos.y - 1]
-                    .chars()
-                    .nth(bullet.pos.x)
-                    .unwrap()
-                    != ' '
-            {
+            if bullet.pos.y >= 1 && self.field[bullet.pos.y - 1][bullet.pos.x] != ' ' {
                 fix_bullet = true;
             }
 
@@ -244,23 +224,14 @@ impl Game {
                     bullet.offset_y = 0;
                     bullet.pos.y -= 1;
 
-                    if bullet.pos.y >= 1
-                        && self.field[bullet.pos.y - 1]
-                            .chars()
-                            .nth(bullet.pos.x)
-                            .unwrap()
-                            != ' '
-                    {
+                    if bullet.pos.y >= 1 && self.field[bullet.pos.y - 1][bullet.pos.x] != ' ' {
                         fix_bullet = true;
                     }
                 }
             }
 
             if fix_bullet {
-                let mut row = self.field[bullet.pos.y].clone();
-                let replace_with = &self.field[bullet.pos.y - 1][bullet.pos.x..bullet.pos.x + 1];
-                row.replace_range(bullet.pos.x..bullet.pos.x + 1, replace_with);
-                self.field[bullet.pos.y] = row;
+                self.field[bullet.pos.y][bullet.pos.x] = self.field[bullet.pos.y - 1][bullet.pos.x];
                 bullet.exist = false;
             }
         }

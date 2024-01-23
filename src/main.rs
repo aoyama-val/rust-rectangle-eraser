@@ -226,7 +226,7 @@ fn render(
     // render field
     for y in 0..FIELD_H {
         for x in 0..FIELD_W {
-            let ch = game.field[y].chars().nth(x).unwrap();
+            let ch = game.field[y][x];
             if ch != ' ' {
                 let color_index = (ch as i32) % 6;
                 let color = match color_index {
