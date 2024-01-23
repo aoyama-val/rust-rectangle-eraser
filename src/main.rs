@@ -113,11 +113,14 @@ pub fn main() -> Result<(), String> {
                     is_keydown = true;
                     match code {
                         Keycode::Return => {
-                            if game.is_over {
-                                game = Game::new();
-                            }
+                            // if game.is_over {
+                            game = Game::new();
+                            // }
                         }
-                        Keycode::F1 => game.toggle_debug(),
+                        Keycode::F1 => {
+                            game.toggle_debug();
+                            game.field.print_with_coord();
+                        }
                         _ => {}
                     };
                 }

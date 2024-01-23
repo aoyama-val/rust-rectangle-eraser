@@ -254,23 +254,31 @@ impl Game {
     pub fn update_bullets(&mut self) {
         for i in 0..self.bullets.len() {
             let mut fix_bullet = false;
+            let mut reason = "";
             let bullet_pos = self.bullets[i].pos;
+
+            // フィールドのスクロールにより衝突した
             if bullet_pos.y >= 1 && self.field.cells[bullet_pos.y - 1][bullet_pos.x] != EMPTY {
                 fix_bullet = true;
+                reason = "field";
             }
 
-            self.bullets[i].offset_y -= BULLET_SPEED;
-            if self.bullets[i].offset_y < -CELL_SIZE {
-                if bullet_pos.y == 0 {
-                    self.bullets[i].exist = false;
-                } else {
-                    self.bullets[i].offset_y = 0;
-                    self.bullets[i].pos.y -= 1;
+            if !fix_bullet {
+                self.bullets[i].offset_y -= BULLET_SPEED;
+                if self.bullets[i].offset_y <= -CELL_SIZE {
+                    if bullet_pos.y == 0 {
+                        // 画面上を越えたら弾消去
+                        self.bullets[i].exist = false;
+                    } else {
+                        self.bullets[i].offset_y = 0;
+                        self.bullets[i].pos.y -= 1;
 
-                    if bullet_pos.y >= 1
-                        && self.field.cells[bullet_pos.y - 1][bullet_pos.x] != EMPTY
-                    {
-                        fix_bullet = true;
+                        if bullet_pos.y >= 1
+                            && self.field.cells[bullet_pos.y - 1][bullet_pos.x] != EMPTY
+                        {
+                            fix_bullet = true;
+                            reason = "bullet";
+                        }
                     }
                 }
             }
@@ -279,7 +287,8 @@ impl Game {
                 self.field.cells[bullet_pos.y][bullet_pos.x] =
                     self.field.cells[bullet_pos.y - 1][bullet_pos.x];
                 self.bullets[i].exist = false;
-
+                println!("fix: reason = {}", reason);
+                println!("check erase {:?}", bullet_pos);
                 self.erase_rectangle(bullet_pos);
 
                 self.requested_sounds.push("hit.wav");
