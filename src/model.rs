@@ -171,7 +171,7 @@ impl Game {
             return;
         }
 
-        if self.frame % 5 == 0 {
+        if self.frame % 15 == 0 {
             self.scroll();
         }
 
@@ -224,6 +224,18 @@ impl Game {
 
     pub fn update_bullets(&mut self) {
         for bullet in &mut self.bullets {
+            let mut fix_bullet = false;
+
+            if bullet.pos.y >= 1
+                && self.field[bullet.pos.y - 1]
+                    .chars()
+                    .nth(bullet.pos.x)
+                    .unwrap()
+                    != ' '
+            {
+                fix_bullet = true;
+            }
+
             bullet.offset_y -= BULLET_SPEED;
             if bullet.offset_y < -CELL_SIZE {
                 if bullet.pos.y == 0 {
@@ -231,7 +243,25 @@ impl Game {
                 } else {
                     bullet.offset_y = 0;
                     bullet.pos.y -= 1;
+
+                    if bullet.pos.y >= 1
+                        && self.field[bullet.pos.y - 1]
+                            .chars()
+                            .nth(bullet.pos.x)
+                            .unwrap()
+                            != ' '
+                    {
+                        fix_bullet = true;
+                    }
                 }
+            }
+
+            if fix_bullet {
+                let mut row = self.field[bullet.pos.y].clone();
+                let replace_with = &self.field[bullet.pos.y - 1][bullet.pos.x..bullet.pos.x + 1];
+                row.replace_range(bullet.pos.x..bullet.pos.x + 1, replace_with);
+                self.field[bullet.pos.y] = row;
+                bullet.exist = false;
             }
         }
 
