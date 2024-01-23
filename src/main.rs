@@ -19,6 +19,13 @@ pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32 + INFO_WIDTH;
 pub const SCREEN_HEIGHT: i32 = CELL_SIZE * 16;
 pub const INFO_WIDTH: i32 = 200;
 
+mod sound {
+    pub const MAX_CHANNELS: i32 = 10;
+    pub const CH_SHOOT: i32 = 4;
+    pub const CH_HIT: i32 = 3;
+    pub const CH_ERASE: i32 = 2;
+}
+
 struct Image<'a> {
     texture: Texture<'a>,
     #[allow(dead_code)]
@@ -149,7 +156,7 @@ fn init_mixer() {
         chunk_size,
     )
     .expect("cannot open audio");
-    let _mixer_context = mixer::init(mixer::InitFlag::MP3).expect("cannot init mixer");
+    mixer::allocate_channels(sound::MAX_CHANNELS);
 }
 
 fn load_resources<'a>(
@@ -402,6 +409,14 @@ fn play_sounds(game: &mut Game, resources: &Resources) {
             .chunks
             .get(&sound_key.to_string())
             .expect("cannot get sound");
+
+        let channel = match *sound_key {
+            "shoot.wav" => sdl2::mixer::Channel(sound::CH_SHOOT),
+            "hit.wav" => sdl2::mixer::Channel(sound::CH_HIT),
+            "erase.wav" => sdl2::mixer::Channel(sound::CH_ERASE),
+            _ => sdl2::mixer::Channel::all(),
+        };
+        channel.play(&chunk, 0).expect("cannot play sound");
         sdl2::mixer::Channel::all()
             .play(&chunk, 0)
             .expect("cannot play sound");

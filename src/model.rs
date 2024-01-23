@@ -287,6 +287,8 @@ impl Game {
                 self.bullets[i].exist = false;
 
                 self.erase_rectangle(bullet_pos);
+
+                self.requested_sounds.push("hit.wav");
             }
         }
     }
@@ -345,6 +347,7 @@ impl Game {
             }
 
             effect.erase_wait = ERASE_WAIT;
+            self.requested_sounds.push("erase.wav");
         }
     }
 
@@ -381,6 +384,7 @@ impl Game {
         let bullet = Bullet::new(self.player_x);
         self.bullets.push(bullet);
         self.shoot_wait = SHOOT_WAIT;
+        self.requested_sounds.push("shoot.wav");
     }
 
     pub fn erase_rectangle(&mut self, bullet_pos: Point) {
