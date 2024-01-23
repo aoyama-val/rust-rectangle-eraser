@@ -5,7 +5,7 @@ pub const FPS: i32 = 30;
 pub const FIELD_W: usize = 16;
 pub const FIELD_H: usize = 16;
 pub const MOVE_WAIT: i32 = 3;
-pub const CELL_SIZE: i32 = 20;
+pub const CELL_SIZE: i32 = 30;
 pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -39,6 +39,7 @@ pub enum Direction {
 pub struct Game {
     pub rng: StdRng,
     pub is_over: bool,
+    pub is_clear: bool,
     pub should_getline: bool,
     pub requested_sounds: Vec<&'static str>,
     pub width: usize,  // must be >= 2
@@ -47,8 +48,9 @@ pub struct Game {
     pub erased: Vec<Vec<bool>>,
     pub cursor: Point,
     pub erase_dir: Direction,
-    pub field: [[i32; FIELD_W]; FIELD_H],
+    pub field: [String; FIELD_H],
     pub stage: Vec<String>,
+    pub next_row: usize,
     pub player_x: usize,
     // pub player_offset: i32,
     pub move_dir: Direction,
@@ -69,6 +71,7 @@ impl Game {
         let mut game = Game {
             rng: rng,
             is_over: false,
+            is_clear: false,
             should_getline: true,
             requested_sounds: Vec::new(),
             width: width,
@@ -77,8 +80,26 @@ impl Game {
             erased: Vec::new(),
             cursor: Point::default(),
             erase_dir: Direction::Right,
-            field: [[0; FIELD_W]; FIELD_H],
+            field: [
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+                " ".repeat(FIELD_W).to_string(),
+            ],
             stage: Vec::new(),
+            next_row: 0,
             player_x: FIELD_W / 2,
             // player_offset: 0,
             move_dir: Direction::Left,
@@ -88,6 +109,7 @@ impl Game {
         game.erased = vec![vec![false; game.width]; game.height];
 
         game.load_stage("resources/data/stage1.txt");
+
         // println!("STAGE");
         // for row in &game.stage {
         //     println!("{}", row);
@@ -108,13 +130,19 @@ impl Game {
             assert!(row.len() == FIELD_W);
             self.stage.push(row);
         }
+
+        self.next_row = self.stage.len() - 1;
     }
 
     pub fn update(&mut self, command: Command) {
         self.frame += 1;
 
-        if self.is_over {
+        if self.is_over || self.is_clear {
             return;
+        }
+
+        if self.frame % 5 == 0 {
+            self.scroll();
         }
 
         self.move_player();
@@ -124,6 +152,19 @@ impl Game {
             Command::Left | Command::Right => self.start_move_player(command),
             _ => {}
         }
+    }
+
+    pub fn scroll(&mut self) {
+        if self.next_row == 0 {
+            self.is_clear = true;
+            return;
+        }
+
+        for y in (1..=(FIELD_H - 1)).rev() {
+            self.field[y] = self.field[y - 1].clone();
+        }
+        self.field[0] = self.stage[self.next_row].clone();
+        self.next_row -= 1;
     }
 
     // 移動中のアニメーション処理

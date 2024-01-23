@@ -216,8 +216,34 @@ fn render(
 
     let font = resources.fonts.get_mut("boxfont").unwrap();
 
+    // render field
+    for y in 0..FIELD_H {
+        for x in 0..FIELD_W {
+            let ch = game.field[y].chars().nth(x).unwrap();
+            if ch != ' ' {
+                let color_index = (ch as i32) % 6;
+                let color = match color_index {
+                    1 => Color::RGB(255, 128, 128),
+                    2 => Color::RGB(128, 255, 128),
+                    3 => Color::RGB(128, 128, 255),
+                    4 => Color::RGB(255, 255, 128),
+                    5 => Color::RGB(128, 255, 255),
+                    0 => Color::RGB(255, 128, 255),
+                    _ => panic!("Invalid n: {}", ch),
+                };
+                canvas.set_draw_color(color);
+                canvas.fill_rect(Rect::new(
+                    x as i32 * CELL_SIZE,
+                    y as i32 * CELL_SIZE,
+                    CELL_SIZEu32,
+                    CELL_SIZEu32,
+                ))?;
+            }
+        }
+    }
+
     // render player
-    canvas.set_draw_color(Color::RGB(128, 128, 255));
+    canvas.set_draw_color(Color::RGB(192, 192, 192));
     let offset_x;
     if game.move_wait > 0 {
         offset_x = ((if game.move_dir == Direction::Left {
@@ -269,6 +295,18 @@ fn render(
             SCREEN_WIDTH / 2,
             SCREEN_HEIGHT / 2,
             Color::RGBA(128, 128, 255, 255),
+            true,
+        );
+    }
+
+    if game.is_clear {
+        render_font(
+            canvas,
+            font,
+            "CLEAR".to_string(),
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            Color::RGBA(255, 255, 128, 255),
             true,
         );
     }
