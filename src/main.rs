@@ -235,8 +235,8 @@ fn render(
                 canvas.fill_rect(Rect::new(
                     x as i32 * CELL_SIZE,
                     y as i32 * CELL_SIZE,
-                    CELL_SIZEu32,
-                    CELL_SIZEu32,
+                    CELL_SIZEu32 - 1,
+                    CELL_SIZEu32 - 1,
                 ))?;
             } else if ch != EMPTY {
                 let color_index = (ch as i32) % 6;
@@ -301,15 +301,6 @@ fn render(
     ))?;
     let font_color = Color::RGB(0x6A, 0x5D, 0x1F);
     let font_color2 = Color::RGB(0x76, 0x6E, 0x5A);
-    // render_font(
-    //     canvas,
-    //     font,
-    //     "Progress".to_string(),
-    //     SCREEN_WIDTH - INFO_WIDTH + 40,
-    //     200,
-    //     font_color,
-    //     false,
-    // );
     render_font(
         canvas,
         font,
@@ -319,15 +310,6 @@ fn render(
         font_color,
         false,
     );
-    // render_font(
-    //     canvas,
-    //     font,
-    //     "Score".to_string(),
-    //     SCREEN_WIDTH - INFO_WIDTH + 40,
-    //     260,
-    //     font_color2,
-    //     false,
-    // );
     render_font(
         canvas,
         font,
@@ -343,7 +325,7 @@ fn render(
             canvas,
             font,
             "GAME OVER".to_string(),
-            SCREEN_WIDTH / 2,
+            (SCREEN_WIDTH - INFO_WIDTH) / 2,
             SCREEN_HEIGHT / 2,
             Color::RGBA(128, 128, 255, 255),
             true,
@@ -355,7 +337,7 @@ fn render(
             canvas,
             font,
             "CONGRATULATIONS!".to_string(),
-            SCREEN_WIDTH / 2,
+            (SCREEN_WIDTH - INFO_WIDTH) / 2,
             SCREEN_HEIGHT / 2,
             Color::RGBA(255, 255, 128, 255),
             true,

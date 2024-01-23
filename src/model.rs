@@ -169,6 +169,10 @@ impl Game {
             }
         }
 
+        if self.is_field_empty() {
+            self.scroll_wait = 1;
+        }
+
         if self.scroll_wait > 0 {
             self.scroll_wait -= 1;
             if self.scroll_wait == 0 {
@@ -193,6 +197,17 @@ impl Game {
 
         self.bullets.retain(|x| x.exist);
         self.erasing_effects.retain(|x| x.exist);
+    }
+
+    pub fn is_field_empty(&self) -> bool {
+        for y in 0..FIELD_H {
+            for x in 0..FIELD_W {
+                if self.field.cells[y][x] != EMPTY {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     pub fn scroll(&mut self) {
@@ -325,6 +340,8 @@ impl Game {
             }
             if self.field.cells[effect.cursor.y][effect.cursor.x] == EMPTY {
                 effect.exist = false;
+                self.score +=
+                    ((effect.right - effect.left + 1) * (effect.bottom - effect.top + 1)) as i32;
             }
 
             effect.erase_wait = ERASE_WAIT;
