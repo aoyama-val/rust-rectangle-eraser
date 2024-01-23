@@ -74,6 +74,14 @@ pub fn main() -> Result<(), String> {
         let started = SystemTime::now();
 
         let mut command = Command::None;
+
+        let keyboard_state = event_pump.keyboard_state();
+        if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
+            command = Command::Left;
+        } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
+            command = Command::Right;
+        }
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } => break 'running,
@@ -92,12 +100,6 @@ pub fn main() -> Result<(), String> {
                             } else {
                                 command = Command::Shoot;
                             }
-                        }
-                        Keycode::Left => {
-                            command = Command::Left;
-                        }
-                        Keycode::Right => {
-                            command = Command::Right;
                         }
                         _ => {}
                     };
@@ -227,7 +229,6 @@ fn render(
     } else {
         offset_x = 0;
     }
-    println!("{} {}", game.move_wait, offset_x);
     canvas.fill_rect(Rect::new(
         game.player_x as i32 * CELL_SIZE + offset_x,
         SCREEN_HEIGHT - CELL_SIZE,
