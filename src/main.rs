@@ -351,7 +351,7 @@ fn render(
             font,
             "GAME OVER".to_string(),
             (SCREEN_WIDTH - INFO_WIDTH) / 2,
-            SCREEN_HEIGHT / 2,
+            205,
             Color::RGBA(128, 128, 255, 255),
             true,
         );
@@ -363,7 +363,7 @@ fn render(
             font,
             "CONGRATULATIONS!".to_string(),
             (SCREEN_WIDTH - INFO_WIDTH) / 2,
-            SCREEN_HEIGHT / 2,
+            205,
             Color::RGBA(255, 255, 128, 255),
             true,
         );
