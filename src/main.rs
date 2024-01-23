@@ -238,8 +238,8 @@ fn render(
                 canvas.fill_rect(Rect::new(
                     x as i32 * CELL_SIZE,
                     y as i32 * CELL_SIZE,
-                    CELL_SIZEu32 - 1,
-                    CELL_SIZEu32 - 1,
+                    CELL_SIZE as u32 - 1,
+                    CELL_SIZE as u32 - 1,
                 ))?;
             } else if ch != EMPTY {
                 let color_index = (ch as i32) % 6;
@@ -256,8 +256,8 @@ fn render(
                 canvas.fill_rect(Rect::new(
                     x as i32 * CELL_SIZE,
                     y as i32 * CELL_SIZE,
-                    CELL_SIZEu32,
-                    CELL_SIZEu32,
+                    CELL_SIZE as u32,
+                    CELL_SIZE as u32,
                 ))?;
             }
         }
@@ -296,8 +296,8 @@ fn render(
     canvas.fill_rect(Rect::new(
         game.player_x as i32 * CELL_SIZE + offset_x,
         SCREEN_HEIGHT - CELL_SIZE,
-        CELL_SIZEu32,
-        CELL_SIZEu32,
+        CELL_SIZE as u32,
+        CELL_SIZE as u32,
     ))?;
 
     // render bullets
@@ -306,8 +306,8 @@ fn render(
         canvas.fill_rect(Rect::new(
             bullet.pos.x as i32 * CELL_SIZE,
             bullet.pos.y as i32 * CELL_SIZE + bullet.offset_y,
-            CELL_SIZEu32,
-            CELL_SIZEu32,
+            CELL_SIZE as u32,
+            CELL_SIZE as u32,
         ))?;
     }
 

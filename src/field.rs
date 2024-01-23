@@ -32,6 +32,8 @@ impl Field {
             cells: [[EMPTY; FIELD_W]; FIELD_H],
         }
     }
+
+    #[allow(dead_code)]
     pub fn from_text(cells_text: &str) -> Field {
         let mut field = Field {
             cells: [[' '; FIELD_W]; FIELD_H],
@@ -52,6 +54,7 @@ impl Field {
         field
     }
 
+    #[allow(dead_code)]
     pub fn print_with_coord(&self) {
         print!("  ");
         for i in 0..self.cells[0].len() {
@@ -69,6 +72,7 @@ impl Field {
     }
 
     pub fn get(&self, x: usize, y: usize) -> Cell {
+        #[allow(unused_comparisons)]
         if 0 <= x && x < FIELD_W && 0 <= y && y < FIELD_H {
             self.cells[y][x]
         } else {

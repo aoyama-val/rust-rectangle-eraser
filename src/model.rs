@@ -10,7 +10,6 @@ pub const SCROLL_WAIT: i32 = 30;
 pub const BULLET_COUNT_MAX: i32 = 4;
 pub const BULLET_SPEED: i32 = 30;
 pub const CELL_SIZE: i32 = 30;
-pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
 pub const ERASING: Cell = '*';
 pub const ERASE_WAIT: i32 = 1;
 
