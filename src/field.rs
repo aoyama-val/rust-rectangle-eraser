@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-type Cell = char;
+pub type Cell = char;
 
 pub const EMPTY: Cell = ' ';
 
@@ -179,11 +179,15 @@ impl Field {
         return answers;
     }
 
-    pub fn find_rectangle_to_be_erased(&self) -> Option<Rectangle> {
-        let mut answers = self.find_all_rectangles();
-        answers.sort_by(|a, b| b.area().cmp(&a.area()));
-        if answers.len() >= 1 {
-            return Some(answers[0]);
+    pub fn find_rectangle_to_be_erased(&self, x: usize, y: usize) -> Option<Rectangle> {
+        let mut rectangles = self.find_all_rectangles();
+        rectangles.sort_by(|a, b| b.area().cmp(&a.area()));
+        for r in &rectangles {
+            // 矩形が最後に着弾した位置を含むなら
+            // これがないと、初期配置ですでに矩形を成しているところがフィールドに表示されると同時に消えてしまう
+            if r.left <= x && x <= r.right && r.top <= y && y <= r.bottom {
+                return Some(*r);
+            }
         }
         return None;
     }

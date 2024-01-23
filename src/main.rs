@@ -1,3 +1,4 @@
+use field::EMPTY;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::mixer;
@@ -11,6 +12,7 @@ use std::fs;
 use std::time::{Duration, SystemTime};
 mod field;
 mod model;
+use crate::field::*;
 use crate::model::*;
 
 pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32;
@@ -66,7 +68,7 @@ pub fn main() -> Result<(), String> {
 
     let mut event_pump = sdl_context.event_pump()?;
 
-    let mut game = Game::new(2, 2);
+    let mut game = Game::new();
 
     println!("Keys:");
     println!("  Space       : Restart when gameover");
@@ -121,14 +123,6 @@ pub fn main() -> Result<(), String> {
         render(&mut canvas, &game, &mut resources)?;
 
         play_sounds(&mut game, &resources);
-
-        if game.is_over {
-            if game.height < game.width {
-                game = Game::new(game.width, game.height + 1);
-            } else {
-                game = Game::new(game.width + 1, 2);
-            }
-        }
 
         let finished = SystemTime::now();
         let elapsed = finished.duration_since(started).unwrap();
@@ -230,7 +224,16 @@ fn render(
     for y in 0..FIELD_H {
         for x in 0..FIELD_W {
             let ch = game.field.cells[y][x];
-            if ch != ' ' {
+            if ch == ERASING {
+                let color = Color::RGB(255, 255, 255);
+                canvas.set_draw_color(color);
+                canvas.fill_rect(Rect::new(
+                    x as i32 * CELL_SIZE,
+                    y as i32 * CELL_SIZE,
+                    CELL_SIZEu32,
+                    CELL_SIZEu32,
+                ))?;
+            } else if ch != EMPTY {
                 let color_index = (ch as i32) % 6;
                 let color = match color_index {
                     1 => Color::RGB(255, 128, 128),
@@ -282,31 +285,6 @@ fn render(
             CELL_SIZEu32,
         ))?;
     }
-
-    // 渦巻き状に消えるブロックを描画
-    // canvas.set_draw_color(Color::RGB(255, 128, 128));
-    // for y in 0..game.height {
-    //     for x in 0..game.width {
-    //         if !game.erased[y][x] {
-    //             canvas.fill_rect(Rect::new(
-    //                 100 + x as i32 * CELL_SIZE,
-    //                 100 + y as i32 * CELL_SIZE,
-    //                 CELL_SIZEu32 - 1,
-    //                 CELL_SIZEu32 - 1,
-    //             ))?;
-    //         }
-    //     }
-    // }
-
-    render_font(
-        canvas,
-        font,
-        format!("{} x {}", game.width, game.height).to_string(),
-        0,
-        0,
-        Color::RGBA(255, 255, 255, 255),
-        false,
-    );
 
     if game.is_over {
         render_font(
