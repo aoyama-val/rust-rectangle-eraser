@@ -199,6 +199,11 @@ impl Game {
             return;
         }
 
+        // 矩形が消えている最中はスクロールしない
+        if self.erasing_effects.len() > 0 {
+            return;
+        }
+
         // 1つ上の行をコピー
         for y in (1..=(FIELD_H - 1)).rev() {
             for x in 0..FIELD_W {
