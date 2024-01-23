@@ -74,6 +74,7 @@ pub fn main() -> Result<(), String> {
         let started = SystemTime::now();
 
         let mut command = Command::None;
+        let mut is_keydown = false;
 
         let keyboard_state = event_pump.keyboard_state();
         if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
@@ -94,6 +95,7 @@ pub fn main() -> Result<(), String> {
                     if code == Keycode::Escape {
                         break 'running;
                     }
+                    is_keydown = true;
                     match code {
                         Keycode::Space => {
                             if game.is_over {
@@ -103,13 +105,16 @@ pub fn main() -> Result<(), String> {
                                 //     command = Command::Shoot;
                             }
                         }
+                        Keycode::F1 => game.toggle_debug(),
                         _ => {}
                     };
                 }
                 _ => {}
             }
         }
-        game.update(command);
+        if !game.is_debug || is_keydown {
+            game.update(command);
+        }
         render(&mut canvas, &game, &mut resources)?;
 
         play_sounds(&mut game, &resources);

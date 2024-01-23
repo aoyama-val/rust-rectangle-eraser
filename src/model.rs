@@ -59,6 +59,7 @@ pub struct Game {
     pub rng: StdRng,
     pub is_over: bool,
     pub is_clear: bool,
+    pub is_debug: bool,
     pub should_getline: bool,
     pub requested_sounds: Vec<&'static str>,
     pub width: usize,  // must be >= 2
@@ -93,6 +94,7 @@ impl Game {
             rng: rng,
             is_over: false,
             is_clear: false,
+            is_debug: false,
             should_getline: true,
             requested_sounds: Vec::new(),
             width: width,
@@ -140,6 +142,11 @@ impl Game {
         // println!("STAGE");
 
         game
+    }
+
+    pub fn toggle_debug(&mut self) {
+        self.is_debug = !self.is_debug;
+        println!("is_debug: {}", self.is_debug);
     }
 
     pub fn load_stage(&mut self, filename: &str) {
