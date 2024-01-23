@@ -1,6 +1,8 @@
 use rand::prelude::*;
 use std::time;
 
+use crate::field::*;
+
 pub const FPS: i32 = 30;
 pub const FIELD_W: usize = 16;
 pub const FIELD_H: usize = 16;
@@ -69,7 +71,7 @@ pub struct Game {
     pub erased: Vec<Vec<bool>>,
     pub cursor: Point,
     pub erase_dir: Direction,
-    pub field: [[char; FIELD_W]; FIELD_H],
+    pub field: Field,
     pub stage: Vec<String>,
     pub next_row: usize,
     pub player_x: usize,
@@ -104,7 +106,7 @@ impl Game {
             erased: Vec::new(),
             cursor: Point::default(),
             erase_dir: Direction::Right,
-            field: [[' '; FIELD_W]; FIELD_H],
+            field: Field::new(),
             stage: Vec::new(),
             next_row: 0,
             player_x: FIELD_W / 2,
@@ -180,10 +182,10 @@ impl Game {
         }
 
         for y in (1..=(FIELD_H - 1)).rev() {
-            self.field[y] = self.field[y - 1].clone();
+            self.field.cells[y] = self.field.cells[y - 1].clone();
         }
         for x in 0..FIELD_W {
-            self.field[0][x] = self.stage[self.next_row].chars().nth(x).unwrap();
+            self.field.cells[0][x] = self.stage[self.next_row].chars().nth(x).unwrap();
         }
         self.next_row -= 1;
     }
@@ -212,7 +214,7 @@ impl Game {
         for bullet in &mut self.bullets {
             let mut fix_bullet = false;
 
-            if bullet.pos.y >= 1 && self.field[bullet.pos.y - 1][bullet.pos.x] != ' ' {
+            if bullet.pos.y >= 1 && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != ' ' {
                 fix_bullet = true;
             }
 
@@ -224,14 +226,16 @@ impl Game {
                     bullet.offset_y = 0;
                     bullet.pos.y -= 1;
 
-                    if bullet.pos.y >= 1 && self.field[bullet.pos.y - 1][bullet.pos.x] != ' ' {
+                    if bullet.pos.y >= 1 && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != ' '
+                    {
                         fix_bullet = true;
                     }
                 }
             }
 
             if fix_bullet {
-                self.field[bullet.pos.y][bullet.pos.x] = self.field[bullet.pos.y - 1][bullet.pos.x];
+                self.field.cells[bullet.pos.y][bullet.pos.x] =
+                    self.field.cells[bullet.pos.y - 1][bullet.pos.x];
                 bullet.exist = false;
             }
         }

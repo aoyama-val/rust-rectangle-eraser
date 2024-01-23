@@ -9,6 +9,7 @@ use sdl2::video::{Window, WindowContext};
 use std::collections::HashMap;
 use std::fs;
 use std::time::{Duration, SystemTime};
+mod field;
 mod model;
 use crate::model::*;
 
@@ -69,6 +70,8 @@ pub fn main() -> Result<(), String> {
 
     println!("Keys:");
     println!("  Space       : Restart when gameover");
+
+    field::test();
 
     'running: loop {
         let started = SystemTime::now();
@@ -226,7 +229,7 @@ fn render(
     // render field
     for y in 0..FIELD_H {
         for x in 0..FIELD_W {
-            let ch = game.field[y][x];
+            let ch = game.field.cells[y][x];
             if ch != ' ' {
                 let color_index = (ch as i32) % 6;
                 let color = match color_index {
