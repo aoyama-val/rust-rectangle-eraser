@@ -413,4 +413,18 @@ impl Game {
             (100.0 - (self.next_row as f32 / self.stage.len() as f32) * 100.0) as i32
         }
     }
+
+    pub fn get_sight_pos(&self) -> Option<Point> {
+        for y in (0..=(FIELD_H - 2)).rev() {
+            let cell = self.field.cells[y][self.player_x];
+            if cell != EMPTY && cell != ERASING {
+                if self.field.cells[y + 1][self.player_x] == EMPTY {
+                    return Some(Point::new(self.player_x, y + 1));
+                } else {
+                    return None;
+                }
+            }
+        }
+        return None;
+    }
 }

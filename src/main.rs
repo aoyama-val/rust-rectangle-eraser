@@ -169,6 +169,7 @@ fn load_resources<'a>(
         let path_str = path.to_str().unwrap();
         if path_str.ends_with(".bmp") {
             let temp_surface = sdl2::surface::Surface::load_bmp(&path).unwrap();
+            // temp_surface.set_color_key(enable, color)
             let texture = texture_creator
                 .create_texture_from_surface(&temp_surface)
                 .expect(&format!("cannot load image: {}", path_str));
@@ -258,6 +259,23 @@ fn render(
                 ))?;
             }
         }
+    }
+
+    // render sight
+    if let Some(sight_pos) = game.get_sight_pos() {
+        let image = resources.images.get("sight.bmp").unwrap();
+        canvas
+            .copy(
+                &image.texture,
+                Rect::new(0, 0, image.w, image.h),
+                Rect::new(
+                    sight_pos.x as i32 * CELL_SIZE,
+                    sight_pos.y as i32 * CELL_SIZE,
+                    image.w as u32,
+                    image.h as u32,
+                ),
+            )
+            .unwrap();
     }
 
     // render player
