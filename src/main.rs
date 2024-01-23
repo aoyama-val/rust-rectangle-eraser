@@ -205,6 +205,14 @@ fn load_resources<'a>(
         "boxfont",
     );
 
+    load_font(
+        &mut resources,
+        &ttf_context,
+        "./resources/font/boxfont2.ttf",
+        14,
+        "boxfont_xs",
+    );
+
     resources
 }
 
@@ -357,6 +365,19 @@ fn render(
             205,
             Color::RGBA(255, 255, 128, 255),
             true,
+        );
+    }
+
+    if game.is_debug {
+        let font_xs = resources.fonts.get_mut("boxfont_xs").unwrap();
+        render_font(
+            canvas,
+            font_xs,
+            format!("{}", game.frame).to_string(),
+            0,
+            0,
+            Color::RGBA(255, 255, 255, 255),
+            false,
         );
     }
 
