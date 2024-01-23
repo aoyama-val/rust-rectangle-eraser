@@ -71,6 +71,8 @@ pub fn main() -> Result<(), String> {
     let mut game = Game::new();
 
     println!("Keys:");
+    println!("  Left, Right : Move player");
+    println!("  Up          : Scroll");
     println!("  Space       : Restart when gameover");
 
     field::test();
@@ -86,6 +88,8 @@ pub fn main() -> Result<(), String> {
             command = Command::Left;
         } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
             command = Command::Right;
+        } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Up) {
+            command = Command::Up;
         } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Space) {
             command = Command::Shoot;
         }

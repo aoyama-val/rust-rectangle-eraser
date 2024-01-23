@@ -19,6 +19,7 @@ pub enum Command {
     None,
     Left,
     Right,
+    Up,
     Shoot,
 }
 
@@ -85,6 +86,7 @@ pub struct Game {
     pub move_dir: Direction,
     pub move_wait: i32,
     pub shoot_wait: i32,
+    pub scroll_wait: i32,
     pub bullets: Vec<Bullet>,
     pub erasing_effects: Vec<ErasingEffect>,
 }
@@ -116,6 +118,7 @@ impl Game {
             move_dir: Direction::Left,
             move_wait: 0,
             shoot_wait: 0,
+            scroll_wait: SCROLL_WAIT,
             bullets: Vec::new(),
             erasing_effects: Vec::new(),
         };
@@ -158,8 +161,18 @@ impl Game {
             return;
         }
 
-        if self.frame % SCROLL_WAIT == 0 {
-            self.scroll();
+        if command == Command::Up {
+            if self.scroll_wait > 5 {
+                self.scroll_wait = 5;
+            }
+        }
+
+        if self.scroll_wait > 0 {
+            self.scroll_wait -= 1;
+            if self.scroll_wait == 0 {
+                self.scroll();
+                self.scroll_wait = SCROLL_WAIT;
+            }
         }
 
         self.update_bullets();
