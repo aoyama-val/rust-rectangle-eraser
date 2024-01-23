@@ -5,6 +5,9 @@ pub const FPS: i32 = 30;
 pub const FIELD_W: usize = 16;
 pub const FIELD_H: usize = 16;
 pub const MOVE_WAIT: i32 = 3;
+pub const SHOOT_WAIT: i32 = 5;
+pub const BULLET_COUNT_MAX: i32 = 4;
+pub const BULLET_SPEED: i32 = 30;
 pub const CELL_SIZE: i32 = 30;
 pub const CELL_SIZEu32: u32 = CELL_SIZE as u32;
 
@@ -36,6 +39,22 @@ pub enum Direction {
     Down,
 }
 
+pub struct Bullet {
+    pub pos: Point,
+    pub offset_y: i32,
+    pub exist: bool,
+}
+
+impl Bullet {
+    pub fn new(x: usize) -> Bullet {
+        Bullet {
+            pos: Point::new(x, FIELD_H - 2),
+            offset_y: 0,
+            exist: true,
+        }
+    }
+}
+
 pub struct Game {
     pub rng: StdRng,
     pub is_over: bool,
@@ -55,6 +74,8 @@ pub struct Game {
     // pub player_offset: i32,
     pub move_dir: Direction,
     pub move_wait: i32,
+    pub shoot_wait: i32,
+    pub bullets: Vec<Bullet>,
 }
 
 impl Game {
@@ -104,6 +125,8 @@ impl Game {
             // player_offset: 0,
             move_dir: Direction::Left,
             move_wait: 0,
+            shoot_wait: 0,
+            bullets: Vec::new(),
         };
 
         game.erased = vec![vec![false; game.width]; game.height];
@@ -145,7 +168,12 @@ impl Game {
             self.scroll();
         }
 
+        self.update_bullets();
+
         self.move_player();
+        if self.shoot_wait > 0 {
+            self.shoot_wait -= 1;
+        }
 
         match command {
             Command::Shoot => self.shoot(),
@@ -187,6 +215,22 @@ impl Game {
         }
     }
 
+    pub fn update_bullets(&mut self) {
+        for bullet in &mut self.bullets {
+            bullet.offset_y -= BULLET_SPEED;
+            if bullet.offset_y < -CELL_SIZE {
+                if bullet.pos.y == 0 {
+                    bullet.exist = false;
+                } else {
+                    bullet.offset_y = 0;
+                    bullet.pos.y -= 1;
+                }
+            }
+        }
+
+        self.bullets.retain(|x| x.exist);
+    }
+
     pub fn start_move_player(&mut self, command: Command) {
         if self.move_wait == 0 {
             match command {
@@ -208,9 +252,18 @@ impl Game {
     }
 
     pub fn shoot(&mut self) {
-        if self.move_wait == 0 {
-            println!("shoot");
+        println!("shoot");
+        if self.shoot_wait > 0 {
+            println!("shoot_wait = {}", self.shoot_wait);
+            return;
         }
+        if self.bullets.len() as i32 >= BULLET_COUNT_MAX {
+            println!("len = {}", self.bullets.len());
+            return;
+        }
+        let bullet = Bullet::new(self.player_x);
+        self.bullets.push(bullet);
+        self.shoot_wait = SHOOT_WAIT;
     }
 
     pub fn update_erase(&mut self, command: Command) {

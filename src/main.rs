@@ -80,6 +80,8 @@ pub fn main() -> Result<(), String> {
             command = Command::Left;
         } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
             command = Command::Right;
+        } else if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Space) {
+            command = Command::Shoot;
         }
 
         for event in event_pump.poll_iter() {
@@ -97,8 +99,8 @@ pub fn main() -> Result<(), String> {
                             if game.is_over {
                                 // game = Game::new();
                                 // game.init();
-                            } else {
-                                command = Command::Shoot;
+                                // } else {
+                                //     command = Command::Shoot;
                             }
                         }
                         _ => {}
@@ -261,6 +263,17 @@ fn render(
         CELL_SIZEu32,
         CELL_SIZEu32,
     ))?;
+
+    // render bullets
+    for bullet in &game.bullets {
+        canvas.set_draw_color(Color::RGB(128, 128, 128));
+        canvas.fill_rect(Rect::new(
+            bullet.pos.x as i32 * CELL_SIZE,
+            bullet.pos.y as i32 * CELL_SIZE + bullet.offset_y,
+            CELL_SIZEu32,
+            CELL_SIZEu32,
+        ))?;
+    }
 
     // 渦巻き状に消えるブロックを描画
     // canvas.set_draw_color(Color::RGB(255, 128, 128));
