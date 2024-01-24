@@ -63,7 +63,7 @@ impl Field {
         println!("");
 
         for (j, row) in self.cells.iter().enumerate() {
-            print!("{:2}", j);
+            print!("{:2} ", j);
             for cell in row {
                 print!("{:2}", cell);
             }
