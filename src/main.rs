@@ -119,6 +119,11 @@ pub fn main() -> Result<(), String> {
                         Keycode::F1 => {
                             game.toggle_debug();
                             game.field.print_with_coord();
+                            println!("{:?}", game);
+                        }
+                        Keycode::F2 => {
+                            game.field.print_with_coord();
+                            println!("{:?}", game);
                         }
                         _ => {}
                     };

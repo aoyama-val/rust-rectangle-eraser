@@ -21,7 +21,7 @@ impl Rectangle {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Field {
     pub cells: [[Cell; FIELD_W]; FIELD_H],
 }

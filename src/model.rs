@@ -56,6 +56,7 @@ pub enum Direction {
     Down,
 }
 
+#[derive(Debug)]
 pub struct Bullet {
     pub pos: Point,
     pub offset_y: i32,
@@ -72,6 +73,7 @@ impl Bullet {
     }
 }
 
+#[derive(Debug)]
 pub struct ErasingEffect {
     pub exist: bool,
     pub cursor: Point,
@@ -83,6 +85,7 @@ pub struct ErasingEffect {
     pub bottom: usize,
 }
 
+#[derive(Debug)]
 pub struct Game {
     pub rng: StdRng,
     pub is_over: bool,
