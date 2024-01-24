@@ -293,9 +293,7 @@ impl Game {
             let mut reason = "";
 
             // フィールドのスクロールにより衝突した
-            if self.bullets[i].pos.y >= 1
-                && self.field.cells[self.bullets[i].pos.y - 1][self.bullets[i].pos.x] != EMPTY
-            {
+            if self.is_collide(&self.bullets[i]) {
                 fix_bullet = true;
                 reason = "field";
                 println!("frame = {}", self.frame);
@@ -313,17 +311,7 @@ impl Game {
                         self.bullets[i].offset_y = 0;
                         self.bullets[i].pos.y -= 1;
 
-                        println!("bullet moved");
-                        println!("bullet.pos = {:?}", self.bullets[i].pos);
-                        println!(
-                            "above: {}",
-                            self.field.cells[self.bullets[i].pos.y - 1][self.bullets[i].pos.x]
-                        );
-
-                        if self.bullets[i].pos.y >= 1
-                            && self.field.cells[self.bullets[i].pos.y - 1][self.bullets[i].pos.x]
-                                != EMPTY
-                        {
+                        if self.is_collide(&self.bullets[i]) {
                             fix_bullet = true;
                             reason = "bullet";
                         }
@@ -342,6 +330,13 @@ impl Game {
                 self.requested_sounds.push("hit.wav");
             }
         }
+    }
+
+    pub fn is_collide(&self, bullet: &Bullet) -> bool {
+        if bullet.pos.y >= 1 && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != EMPTY {
+            return true;
+        }
+        return false;
     }
 
     pub fn update_erasing_effects(&mut self) {
