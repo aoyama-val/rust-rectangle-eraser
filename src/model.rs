@@ -333,7 +333,11 @@ impl Game {
     }
 
     pub fn is_collide(&self, bullet: &Bullet) -> bool {
-        if bullet.pos.y >= 1 && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != EMPTY {
+        if bullet.pos.y >= 1
+            && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != EMPTY
+            && bullet.pos.y >= 1
+            && self.field.cells[bullet.pos.y - 1][bullet.pos.x] != ERASING
+        {
             return true;
         }
         return false;
