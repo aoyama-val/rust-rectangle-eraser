@@ -80,6 +80,7 @@ pub fn main() -> Result<(), String> {
     println!("Keys:");
     println!("  Left, Right : Move player");
     println!("  Up          : Scroll");
+    println!("  Space       : Shoot");
     println!("  Enter       : Restart when gameover");
 
     'running: loop {
