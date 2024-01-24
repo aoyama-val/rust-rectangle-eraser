@@ -236,6 +236,8 @@ mod tests {
             + "                \n"
             + "                \n"
             + "                \n"
+            + "                \n"
+            + "                \n"
             + "";
 
         let field = Field::from_text(&cells_text);
