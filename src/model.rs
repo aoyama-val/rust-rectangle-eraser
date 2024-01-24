@@ -91,23 +91,21 @@ pub struct Game {
     pub is_over: bool,
     pub is_clear: bool,
     pub is_debug: bool,
-    pub should_getline: bool,
     pub requested_sounds: Vec<&'static str>,
     pub frame: i32,
     pub field: Field,
     pub stage: Vec<String>,
-    pub next_row: usize,
+    pub next_row: usize, // 次にstageからfieldにコピーする行のインデックス
     pub player_x: usize,
-    // pub player_offset: i32,
-    pub move_dir: Direction,
+    pub move_dir: Direction, // プレイヤーの移動の方向
     pub move_wait: i32,
     pub shoot_wait: i32,
     pub scroll_wait: i32,
     pub bullets: Vec<Bullet>,
     pub erasing_effects: Vec<ErasingEffect>,
     pub score: i32,
-    pub commands: Vec<Command>,
-    pub command_log: File,
+    pub commands: Vec<Command>, // リプレイデータから読み込んだコマンド
+    pub command_log: File,      // コマンドログ
 }
 
 impl Game {
@@ -126,7 +124,6 @@ impl Game {
             is_over: false,
             is_clear: false,
             is_debug: false,
-            should_getline: true,
             requested_sounds: Vec::new(),
             frame: -1,
             field: Field::new(),
