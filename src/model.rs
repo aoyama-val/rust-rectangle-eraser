@@ -243,6 +243,7 @@ impl Game {
     pub fn scroll(&mut self) {
         if self.next_row == 0 {
             self.is_clear = true;
+            self.requested_sounds.push("clear.wav");
             return;
         }
 
