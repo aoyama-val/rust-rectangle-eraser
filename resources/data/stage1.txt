@@ -146,16 +146,16 @@
 
 
 
-    66677
-    65557
-    6  57
-    44457
-    43337
-    4  3
-    2223
-    2111
-    2  1
-       1
+    mmmnn
+    mllln
+    m  ln
+    kkkln
+    kjjjn
+    k  j
+    iiij
+    ihhh
+    i  h
+       h
 
 
 
