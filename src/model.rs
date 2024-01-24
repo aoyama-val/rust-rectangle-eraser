@@ -1,5 +1,6 @@
 use rand::prelude::*;
-use std::time;
+use std::io::Write;
+use std::{fs::File, time};
 
 use crate::field::*;
 
@@ -20,6 +21,19 @@ pub enum Command {
     Right,
     Up,
     Shoot,
+}
+
+impl Command {
+    pub fn from_str(str: &str) -> Command {
+        match str {
+            "None" => Command::None,
+            "Left" => Command::Left,
+            "Right" => Command::Right,
+            "Up" => Command::Up,
+            "Shoot" => Command::Shoot,
+            _ => Command::None,
+        }
+    }
 }
 
 #[derive(Default, Debug, Copy, Clone, Eq, PartialEq)]
@@ -89,6 +103,8 @@ pub struct Game {
     pub bullets: Vec<Bullet>,
     pub erasing_effects: Vec<ErasingEffect>,
     pub score: i32,
+    pub commands: Vec<Command>,
+    pub command_log: File,
 }
 
 impl Game {
@@ -122,11 +138,19 @@ impl Game {
             bullets: Vec::new(),
             erasing_effects: Vec::new(),
             score: 0,
+            commands: Vec::new(),
+            command_log: File::create("command.log").unwrap(),
         };
 
         game.load_stage("resources/data/stage1.txt");
+        game.load_replay();
 
         game
+    }
+
+    pub fn load_replay(&mut self) {
+        self.commands = load_commands("replay.txt");
+        println!("Loaded {} commands", self.commands.len());
     }
 
     pub fn toggle_debug(&mut self) {
@@ -148,8 +172,13 @@ impl Game {
         self.next_row = self.stage.len() - 1;
     }
 
-    pub fn update(&mut self, command: Command) {
+    pub fn update(&mut self, mut command: Command) {
         self.frame += 1;
+
+        if self.commands.len() > 0 {
+            command = self.commands[self.frame as usize];
+        }
+        self.write_command_log(command);
 
         if self.is_over || self.is_clear {
             return;
@@ -191,6 +220,13 @@ impl Game {
 
         self.bullets.retain(|x| x.exist);
         self.erasing_effects.retain(|x| x.exist);
+    }
+
+    pub fn write_command_log(&mut self, command: Command) {
+        self.command_log
+            .write_all(format!("{:?}\n", command).as_bytes())
+            .ok();
+        self.command_log.flush().ok();
     }
 
     pub fn is_field_empty(&self) -> bool {
@@ -440,4 +476,16 @@ impl Game {
             }
         }
     }
+}
+
+pub fn load_commands(filename: &str) -> Vec<Command> {
+    let mut commands = Vec::new();
+    if let Some(content) = std::fs::read_to_string(filename).ok() {
+        for (_, line) in content.lines().enumerate() {
+            let command = Command::from_str(line);
+            println!("{:?}", command);
+            commands.push(command);
+        }
+    }
+    return commands;
 }
