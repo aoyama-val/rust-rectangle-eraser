@@ -134,25 +134,6 @@ ffffgggghhhhiiii
 
 
 
-   fffbbeeedd
-   f   be   d
-   f   be   d
-   aaaabccccd
-   a  abc  cd
-   a  abc  cd
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -167,6 +148,8 @@ ffffgggghhhhiiii
               c
               c
               c
+
+
 
 
 
@@ -222,6 +205,7 @@ ffffgggghhhhiiii
 
 
 
+
     ddddd
     ccccd
     bbbb
@@ -243,9 +227,86 @@ ffffgggghhhhiiii
 
 
 
+  4444433333
+  422222   3
+   211111
+    1
 
 
 
+
+
+
+
+
+     cccc
+     cbbc
+     cb c
+      baa
+      ba
+      ba
+       a
+       a
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   4443333
+   4   222
+   4     2
+         2
+
+
+    11111
+      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   22222
+   2111
+    1
+    1
+
+
+    bbbb
+    b  b
+    b  b
+    aaa
+     a
 
 
 
@@ -254,3 +315,5 @@ ffffgggghhhhiiii
     22222
     11112
         2
+
+

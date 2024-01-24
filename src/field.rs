@@ -5,7 +5,7 @@ pub type Cell = char;
 pub const EMPTY: Cell = ' ';
 
 pub const FIELD_W: usize = 16;
-pub const FIELD_H: usize = 20;
+pub const FIELD_H: usize = 18;
 
 #[derive(Default, Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Rectangle {

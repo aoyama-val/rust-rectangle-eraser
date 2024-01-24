@@ -15,7 +15,7 @@ use crate::field::*;
 use crate::model::*;
 
 pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32 + INFO_WIDTH;
-pub const SCREEN_HEIGHT: i32 = CELL_SIZE * 16;
+pub const SCREEN_HEIGHT: i32 = CELL_SIZE * FIELD_H as i32;
 pub const INFO_WIDTH: i32 = 200;
 
 mod sound {
@@ -343,7 +343,7 @@ fn render(
         font,
         format!("{:3} pct", game.get_progress()).to_string(),
         SCREEN_WIDTH - INFO_WIDTH + 40,
-        180,
+        210,
         font_color,
         false,
     );
@@ -352,7 +352,7 @@ fn render(
         font,
         format!("  {:05}", game.score).to_string(),
         SCREEN_WIDTH - INFO_WIDTH + 40,
-        230,
+        260,
         font_color2,
         false,
     );
