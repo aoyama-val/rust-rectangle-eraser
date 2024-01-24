@@ -244,6 +244,8 @@ fn render(
     canvas.clear();
 
     let font = resources.fonts.get_mut("boxfont").unwrap();
+    let font_color = Color::RGB(0x6A, 0x5D, 0x1F);
+    let font_color2 = Color::RGB(0x76, 0x6E, 0x5A);
 
     // render field
     for y in 0..FIELD_H {
@@ -328,6 +330,20 @@ fn render(
         ))?;
     }
 
+    // render erased texts
+    for text in &game.erased_texts {
+        render_font(
+            canvas,
+            font,
+            text.text.clone(),
+            text.x,
+            text.y,
+            // Color::RGB(243, 118, 36),
+            font_color2,
+            false,
+        );
+    }
+
     // render info
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.fill_rect(Rect::new(
@@ -336,8 +352,6 @@ fn render(
         INFO_WIDTH as u32,
         SCREEN_HEIGHT as u32,
     ))?;
-    let font_color = Color::RGB(0x6A, 0x5D, 0x1F);
-    let font_color2 = Color::RGB(0x76, 0x6E, 0x5A);
     render_font(
         canvas,
         font,

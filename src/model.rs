@@ -1,4 +1,5 @@
 use rand::prelude::*;
+use std::collections::{HashMap, HashSet};
 use std::io::Write;
 use std::{fs::File, time};
 
@@ -13,6 +14,7 @@ pub const BULLET_SPEED: i32 = 30;
 pub const CELL_SIZE: i32 = 30;
 pub const ERASING: Cell = '*';
 pub const ERASE_WAIT: i32 = 1;
+pub const ERASED_TEXT_VANISH_WAIT: i32 = 30;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Command {
@@ -75,6 +77,8 @@ impl Bullet {
 
 #[derive(Debug)]
 pub struct ErasingEffect {
+    pub points: usize,
+    pub text: String,
     pub exist: bool,
     pub cursor: Point,
     pub erase_wait: i32,
@@ -83,6 +87,15 @@ pub struct ErasingEffect {
     pub top: usize,
     pub right: usize,
     pub bottom: usize,
+}
+
+#[derive(Debug)]
+pub struct ErasedText {
+    pub text: String,
+    pub x: i32,
+    pub y: i32,
+    pub exist: bool,
+    pub vanish_wait: i32,
 }
 
 #[derive(Debug)]
@@ -103,6 +116,7 @@ pub struct Game {
     pub scroll_wait: i32,
     pub bullets: Vec<Bullet>,
     pub erasing_effects: Vec<ErasingEffect>,
+    pub erased_texts: Vec<ErasedText>,
     pub score: i32,
     pub commands: Vec<Command>, // リプレイデータから読み込んだコマンド
     pub command_log: File,      // コマンドログ
@@ -137,6 +151,7 @@ impl Game {
             scroll_wait: SCROLL_WAIT,
             bullets: Vec::new(),
             erasing_effects: Vec::new(),
+            erased_texts: Vec::new(),
             score: 0,
             commands: Vec::new(),
             command_log: File::create("command.log").unwrap(),
@@ -204,6 +219,7 @@ impl Game {
 
         self.update_bullets();
         self.update_erasing_effects();
+        self.update_erased_texts();
 
         self.move_player();
         if self.shoot_wait > 0 {
@@ -220,6 +236,7 @@ impl Game {
 
         self.bullets.retain(|x| x.exist);
         self.erasing_effects.retain(|x| x.exist);
+        self.erased_texts.retain(|x| x.exist);
     }
 
     pub fn write_command_log(&mut self, command: Command) {
@@ -393,12 +410,32 @@ impl Game {
             }
             if self.field.cells[effect.cursor.y][effect.cursor.x] == EMPTY {
                 effect.exist = false;
-                self.score +=
-                    ((effect.right - effect.left + 1) * (effect.bottom - effect.top + 1)) as i32;
+                self.score += effect.points as i32;
+
+                if effect.points >= 1000 {
+                    self.erased_texts.push(ErasedText {
+                        text: effect.text.clone(),
+                        x: ((effect.right + effect.left) as i32 * CELL_SIZE / 2),
+                        y: ((effect.top + effect.bottom) as i32 * CELL_SIZE / 2),
+                        exist: true,
+                        vanish_wait: ERASED_TEXT_VANISH_WAIT,
+                    });
+                }
             }
 
             effect.erase_wait = ERASE_WAIT;
             self.requested_sounds.push("erase.wav");
+        }
+    }
+
+    pub fn update_erased_texts(&mut self) {
+        for i in 0..self.erased_texts.len() {
+            if self.erased_texts[i].vanish_wait > 0 {
+                self.erased_texts[i].vanish_wait -= 1;
+            }
+            if self.erased_texts[i].vanish_wait == 0 {
+                self.erased_texts[i].exist = false;
+            }
         }
     }
 
@@ -440,12 +477,24 @@ impl Game {
             .field
             .find_rectangle_to_be_erased(bullet_pos.x, bullet_pos.y);
         if let Some(r) = r {
+            let mut block_kinds: HashSet<char> = HashSet::new();
             for y in r.top..=r.bottom {
                 for x in r.left..=r.right {
+                    if self.field.cells[y][x] != EMPTY {
+                        block_kinds.insert(self.field.cells[y][x]);
+                    }
                     self.field.cells[y][x] = ERASING;
                 }
             }
+            // ポイント計算
+            let block_count = block_kinds.len();
+            println!("block_count = {}", block_count);
+            let points = block_count * 10 * r.area();
+
+            // 消去中のエフェクト作成
             self.erasing_effects.push(ErasingEffect {
+                points: points,
+                text: format!("{}x{}", block_count * 10, r.area()).to_string(),
                 exist: true,
                 cursor: Point::new(r.left, r.bottom),
                 erase_wait: ERASE_WAIT,
