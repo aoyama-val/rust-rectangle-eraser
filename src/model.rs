@@ -1,5 +1,5 @@
 use rand::prelude::*;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::io::Write;
 use std::{fs::File, time};
 
@@ -83,10 +83,7 @@ pub struct ErasingEffect {
     pub cursor: Point,
     pub erase_wait: i32,
     pub dir: Direction,
-    pub left: usize,
-    pub top: usize,
-    pub right: usize,
-    pub bottom: usize,
+    pub rectangle: Rectangle,
 }
 
 #[derive(Debug)]
@@ -308,15 +305,10 @@ impl Game {
     pub fn update_bullets(&mut self) {
         for i in 0..self.bullets.len() {
             let mut fix_bullet = false;
-            let mut reason = "";
 
             // フィールドのスクロールにより衝突した
             if self.is_collide(&self.bullets[i]) {
                 fix_bullet = true;
-                reason = "field";
-                println!("frame = {}", self.frame);
-                self.field.print_with_coord();
-                println!("bullet.pos = {:?}", self.bullets[i].pos);
             }
 
             if !fix_bullet {
@@ -331,7 +323,6 @@ impl Game {
 
                         if self.is_collide(&self.bullets[i]) {
                             fix_bullet = true;
-                            reason = "bullet";
                         }
                     }
                 }
@@ -341,8 +332,6 @@ impl Game {
                 self.field.cells[self.bullets[i].pos.y][self.bullets[i].pos.x] =
                     self.field.cells[self.bullets[i].pos.y - 1][self.bullets[i].pos.x];
                 self.bullets[i].exist = false;
-                println!("fix: reason = {}", reason);
-                println!("check erase {:?}", self.bullets[i].pos);
                 self.erase_rectangle(self.bullets[i].pos);
 
                 self.requested_sounds.push("hit.wav");
@@ -410,16 +399,13 @@ impl Game {
             }
             if self.field.cells[effect.cursor.y][effect.cursor.x] == EMPTY {
                 effect.exist = false;
-                self.score += effect.erased_block_count
-                    * 10
-                    * (effect.right - effect.left + 1) as i32
-                    * (effect.bottom - effect.top + 1) as i32;
+                self.score += effect.erased_block_count * 10 * effect.rectangle.area() as i32;
 
                 if effect.erased_block_count >= 3 {
                     self.erased_texts.push(ErasedText {
                         text: effect.text.clone(),
-                        x: ((effect.right + effect.left) as i32 * CELL_SIZE / 2),
-                        y: ((effect.top + effect.bottom) as i32 * CELL_SIZE / 2),
+                        x: (effect.rectangle.center_x() * CELL_SIZE as f32) as i32,
+                        y: (effect.rectangle.center_y() * CELL_SIZE as f32) as i32,
                         exist: true,
                         vanish_wait: ERASED_TEXT_VANISH_WAIT,
                     });
@@ -490,7 +476,6 @@ impl Game {
                 }
             }
             let block_count = block_kinds.len();
-            println!("block_count = {}", block_count);
 
             // 消去中のエフェクト作成
             self.erasing_effects.push(ErasingEffect {
@@ -500,10 +485,7 @@ impl Game {
                 cursor: Point::new(r.left, r.bottom),
                 erase_wait: ERASE_WAIT,
                 dir: Direction::Up,
-                left: r.left,
-                top: r.top,
-                right: r.right,
-                bottom: r.bottom,
+                rectangle: r,
             });
         }
     }
@@ -545,7 +527,6 @@ pub fn load_commands(filename: &str) -> Vec<Command> {
     if let Some(content) = std::fs::read_to_string(filename).ok() {
         for (_, line) in content.lines().enumerate() {
             let command = Command::from_str(line);
-            println!("{:?}", command);
             commands.push(command);
         }
     }

@@ -17,7 +17,23 @@ pub struct Rectangle {
 
 impl Rectangle {
     pub fn area(&self) -> usize {
-        (self.right - self.left + 1) * (self.bottom - self.top + 1)
+        self.width() * self.height()
+    }
+
+    pub fn width(&self) -> usize {
+        self.right - self.left + 1
+    }
+
+    pub fn height(&self) -> usize {
+        self.bottom - self.top + 1
+    }
+
+    pub fn center_x(&self) -> f32 {
+        (self.left as f32 + self.right as f32) / 2.0
+    }
+
+    pub fn center_y(&self) -> f32 {
+        (self.top as f32 + self.bottom as f32) / 2.0
     }
 }
 
