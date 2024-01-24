@@ -14,6 +14,7 @@ mod model;
 use crate::field::*;
 use crate::model::*;
 
+pub const WINDOW_TITLE: &str = "rust-rectangle-eraser";
 pub const SCREEN_WIDTH: i32 = CELL_SIZE * FIELD_W as i32 + INFO_WIDTH;
 pub const SCREEN_HEIGHT: i32 = CELL_SIZE * FIELD_H as i32;
 pub const INFO_WIDTH: i32 = 200;
@@ -55,7 +56,7 @@ pub fn main() -> Result<(), String> {
 
     let video_subsystem = sdl_context.video()?;
     let window = video_subsystem
-        .window("rust-blackjack", SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32)
+        .window(WINDOW_TITLE, SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32)
         .position_centered()
         .opengl()
         .build()
