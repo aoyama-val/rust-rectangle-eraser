@@ -219,26 +219,26 @@ mod tests {
     #[test]
     fn test_check_erase_row() {
         #[rustfmt::skip]
-        let cells_text: String =
-              "                \n".to_string()
-            + "                \n"
-            + "                \n"
-            + "   1112222      \n"
-            + "   1  2  2      \n"
-            + "   1  2  2      \n"
-            + "   3334444      \n"
-            + "   3555666      \n"
-            + "   3577776      \n"
-            + "   3577776      \n"
-            + "   3577776      \n"
-            + "                \n"
-            + "                \n"
-            + "                \n"
-            + "                \n"
-            + "                \n"
-            + "                \n"
-            + "                \n"
-            + "";
+        let cells_text: String = concat!(
+              "                \n",
+              "                \n",
+              "                \n",
+              "   1112222      \n",
+              "   1  2  2      \n",
+              "   1  2  2      \n",
+              "   3334444      \n",
+              "   3555666      \n",
+              "   3577776      \n",
+              "   3577776      \n",
+              "   3577776      \n",
+              "                \n",
+              "                \n",
+              "                \n",
+              "                \n",
+              "                \n",
+              "                \n",
+              "                \n",
+        ).to_string();
 
         let field = Field::from_text(&cells_text);
         let mut rectangles = field.find_all_rectangles();
