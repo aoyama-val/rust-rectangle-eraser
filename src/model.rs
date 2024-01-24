@@ -77,7 +77,7 @@ impl Bullet {
 
 #[derive(Debug)]
 pub struct ErasingEffect {
-    pub points: usize,
+    pub erased_block_count: i32,
     pub text: String,
     pub exist: bool,
     pub cursor: Point,
@@ -410,9 +410,12 @@ impl Game {
             }
             if self.field.cells[effect.cursor.y][effect.cursor.x] == EMPTY {
                 effect.exist = false;
-                self.score += effect.points as i32;
+                self.score += effect.erased_block_count
+                    * 10
+                    * (effect.right - effect.left + 1) as i32
+                    * (effect.bottom - effect.top + 1) as i32;
 
-                if effect.points >= 1000 {
+                if effect.erased_block_count >= 3 {
                     self.erased_texts.push(ErasedText {
                         text: effect.text.clone(),
                         x: ((effect.right + effect.left) as i32 * CELL_SIZE / 2),
@@ -486,14 +489,12 @@ impl Game {
                     self.field.cells[y][x] = ERASING;
                 }
             }
-            // ポイント計算
             let block_count = block_kinds.len();
             println!("block_count = {}", block_count);
-            let points = block_count * 10 * r.area();
 
             // 消去中のエフェクト作成
             self.erasing_effects.push(ErasingEffect {
-                points: points,
+                erased_block_count: block_count as i32,
                 text: format!("{}x{}", block_count * 10, r.area()).to_string(),
                 exist: true,
                 cursor: Point::new(r.left, r.bottom),
