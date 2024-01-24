@@ -66,6 +66,8 @@ pub fn main() -> Result<(), String> {
 
     init_mixer();
 
+    let music = sdl2::mixer::Music::from_file("./resources/sound/bgm.mp3")?;
+
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
 
     let mut canvas = window.into_canvas().build().map_err(|e| e.to_string())?;
@@ -83,6 +85,8 @@ pub fn main() -> Result<(), String> {
     println!("  Up          : Scroll");
     println!("  Space       : Shoot");
     println!("  Enter       : Restart when gameover");
+
+    start_music(&music);
 
     'running: loop {
         let started = SystemTime::now();
@@ -114,9 +118,8 @@ pub fn main() -> Result<(), String> {
                     is_keydown = true;
                     match code {
                         Keycode::Return => {
-                            // if game.is_over {
                             game = Game::new();
-                            // }
+                            start_music(&music);
                         }
                         Keycode::F1 => {
                             game.toggle_debug();
@@ -162,6 +165,12 @@ fn init_mixer() {
     )
     .expect("cannot open audio");
     mixer::allocate_channels(sound::MAX_CHANNELS);
+}
+
+fn start_music(music: &mixer::Music) {
+    const MUSIC_START_POS_IN_SEC: f64 = 20.0;
+    music.play(-1).unwrap_or(());
+    sdl2::mixer::Music::set_pos(MUSIC_START_POS_IN_SEC).unwrap_or(());
 }
 
 fn load_resources<'a>(

@@ -17,3 +17,10 @@ Up          : Scroll
 Space       : Shoot
 Enter       : Restart when gameover
 ```
+
+
+## Credits
+
+Thanks to
+
+- Lorenzo Ghielmi for Toccata and Fugue in D minor, BWV 565
