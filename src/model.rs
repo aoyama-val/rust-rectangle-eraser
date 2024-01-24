@@ -142,14 +142,14 @@ impl Game {
             command_log: File::create("command.log").unwrap(),
         };
 
-        game.load_stage("resources/data/stage1.txt");
+        game.load_stage("resources/data/stage1.dat");
         game.load_replay();
 
         game
     }
 
     pub fn load_replay(&mut self) {
-        self.commands = load_commands("replay.txt");
+        self.commands = load_commands("replay.dat");
         println!("Loaded {} commands", self.commands.len());
     }
 
